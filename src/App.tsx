@@ -1,28 +1,27 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
+import React, { useState, useEffect } from 'react';
+import { ISensorResult } from './types';
 import './App.css';
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.tsx</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
-    );
-  }
+function App() {
+  const [sensorResults, setSensorResults] = useState();
+  useEffect(() => {
+    getSensorResults().then((data: ISensorResult) => setSensorResults(data));
+  }, [])
+
+  return (
+    <div className='App'>
+      {sensorResults ? JSON.stringify(sensorResults): null}
+    </div>
+  );
 }
 
+async function getSensorResults(){
+  try {
+    const response = await fetch('http://localhost:3001/getSensorResults');
+    const data = await response.json();
+    return data;
+  } catch(e){
+    console.log(e);
+  }
+}
 export default App;

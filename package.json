@@ -7,16 +7,25 @@
     "@types/node": "11.13.2",
     "@types/react": "16.8.13",
     "@types/react-dom": "16.8.3",
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-scripts": "2.1.8",
-    "typescript": "3.4.2"
+    "typescript": "^3.4.2"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "server": "ts-node ./server/server.ts"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "test/*"
+    ],
+    "delay": "2500"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -26,5 +35,11 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "devDependencies": {
+    "@types/cors": "^2.8.4",
+    "@types/express": "^4.16.1",
+    "nodemon": "^1.18.11",
+    "ts-node": "^8.0.3"
+  }
 }
