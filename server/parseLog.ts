@@ -20,8 +20,8 @@ interface LogOutput {
     [name:string]: string;
 }
 
-(function parseLogFile(){
-    const promises: Promise<InstrumentTrial>[] = [];
+export const parseLogFile: any = () => {
+    const promises: Array<Promise<InstrumentTrial>> = [];
 
     fs.readdir(currentDir, (err, files) => {
         if (err){
@@ -51,7 +51,7 @@ interface LogOutput {
                     //console.log(instrumentTrial);
                 }
                 else {
-                    const measurementLine:Array<string> = line.split(' ');
+                    const measurementLine: Array<string> = line.split(' ');
                     const value = Number(measurementLine[1]);
                     if (!isNaN(value)){
                         instrumentTrial.measurements!.push(value);
@@ -68,17 +68,17 @@ interface LogOutput {
             promises.push(promise);
         });
 
-        Promise.all(promises)
-        .then(values => { 
-            evaluateLogFile(values);
-        })
-        .catch(error => { 
-            console.log(error.message)
-        });
+        const thePromise = Promise.all(promises);
+        console.log(thePromise);
+        return thePromise;
     });
-})();
+};
 
 export const evaluateLogFile = (fileContents: Array<InstrumentTrial>) => {
+    if (fileContents === undefined){
+        console.log('no file contents');
+        return;
+    }
     const output = fileContents.map((trial:InstrumentTrial) => {
         if (trial.type === Instrument.thermometer){
             return evaluateThermometer(trial);

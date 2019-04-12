@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ISensorResult } from './types';
-import './App.css';
+import './assets/css/App.css';
 
 function App() {
   const [sensorResults, setSensorResults] = useState();
@@ -10,6 +10,7 @@ function App() {
 
   return (
     <div className='App'>
+      Hello there...
       {sensorResults ? JSON.stringify(sensorResults): null}
     </div>
   );
