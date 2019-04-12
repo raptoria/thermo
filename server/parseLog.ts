@@ -100,20 +100,22 @@ const evaluateThermometer = (trial: InstrumentTrial) => {
     const mean = calculateMean(trial.measurements);
     const variance = calculateVariance(trial.measurements, mean);
     const stdev = Math.sqrt(variance);
-    //console.log('the std is ' + stdev);
-    //console.log('the mean is ' + mean);
+    let defaultPrecision = '';
+    console.log('the std is ' + stdev);
+    console.log('the mean is ' + mean);
 
     for (let key in config.thermometer) {
         const meanRange: number = config.thermometer[key][0];
         const stDevThreshold: number = config.thermometer[key][1];
         
-        if (meanRange === undefined || stDevThreshold === undefined){
-            return [trial.name, key];
+        if (meanRange == undefined || stDevThreshold === undefined){
+            defaultPrecision = key;
         }
         if (Math.abs(mean - trial.tempRef) <= meanRange && stdev < stDevThreshold){
             return [trial.name, key];
         }
     }
+    return [trial.name, defaultPrecision];
 }
 
 const evaluateHumidity = (trial: InstrumentTrial) => {
