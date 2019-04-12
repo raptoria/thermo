@@ -8,7 +8,7 @@ enum Instrument {
     humidity = 'humidity'
 }
 
-interface InstrumentTrial {
+export interface InstrumentTrial {
     tempRef: number;
     humidityRef: number;
     type: Instrument;
@@ -20,57 +20,58 @@ interface LogOutput {
     [name:string]: string;
 }
 
-export const parseLogFile: any = () => {
+export const parseLogFile = () => {
     const promises: Array<Promise<InstrumentTrial>> = [];
+    return new Promise<Array<InstrumentTrial>>((resolve, reject) => {
 
-    fs.readdir(currentDir, (err, files) => {
-        if (err){
-            throw Error('could not read dir');
-        }
-        //console.log(files);
-        files.forEach(file => {
-           
-            let instrumentTrial: Partial<InstrumentTrial> = {};
-            instrumentTrial.measurements = [];
+        fs.readdir(currentDir, (err, files) => {
+            if (err){
+                throw Error('could not read dir');
+            }
 
-            const rd = readline.createInterface({
-                input: fs.createReadStream(currentDir + '/'+ file),
-            });
+            files.forEach(file => {
+            
+                let instrumentTrial: Partial<InstrumentTrial> = {};
+                instrumentTrial.measurements = [];
 
-            rd.on('line', function(line:string) {
-                if (line.indexOf('reference') > -1){
-                    const referenceLine = line.split(' ');
-                    instrumentTrial.tempRef = Number(referenceLine[1]);
-                    instrumentTrial.humidityRef = Number(referenceLine[2]);
-                }
-                else if (line.startsWith(Instrument.thermometer) || line.startsWith(Instrument.humidity)){
-                    const thermoArr: Array<string> = line.split(' ');
-                    // @ts-ignore
-                    instrumentTrial.type = Instrument[thermoArr[0]];
-                    instrumentTrial.name = thermoArr[1];
-                    //console.log(instrumentTrial);
-                }
-                else {
-                    const measurementLine: Array<string> = line.split(' ');
-                    const value = Number(measurementLine[1]);
-                    if (!isNaN(value)){
-                        instrumentTrial.measurements!.push(value);
-                    }
-                }
-            });
-
-            const promise = new Promise<InstrumentTrial>((resolve) => {
-                rd.on('close', () => {
-                    resolve(instrumentTrial as InstrumentTrial);
+                const rd = readline.createInterface({
+                    input: fs.createReadStream(currentDir + '/'+ file),
                 });
+
+                rd.on('line', function(line:string) {
+                    if (line.indexOf('reference') > -1){
+                        const referenceLine = line.split(' ');
+                        instrumentTrial.tempRef = Number(referenceLine[1]);
+                        instrumentTrial.humidityRef = Number(referenceLine[2]);
+                    }
+                    else if (line.startsWith(Instrument.thermometer) || line.startsWith(Instrument.humidity)){
+                        const instrumentArr: Array<string> = line.split(' ');
+                        const type = instrumentArr[0] as keyof typeof Instrument;
+                        instrumentTrial.type = Instrument[type];
+                        instrumentTrial.name = instrumentArr[1];
+                        //console.log(instrumentTrial);
+                    }
+                    else {
+                        const measurementLine: Array<string> = line.split(' ');
+                        const value = Number(measurementLine[1]);
+                        if (!isNaN(value)){
+                            instrumentTrial.measurements!.push(value);
+                        }
+                    }
+                });
+
+                const promise = new Promise<InstrumentTrial>((resolve) => {
+                    rd.on('close', () => {
+                        resolve(instrumentTrial as InstrumentTrial);
+                    });
+                });
+                promises.push(promise);
             });
 
-            promises.push(promise);
+            Promise.all(promises)
+            .then(values => resolve(values))
+            .catch(error => reject(error));
         });
-
-        const thePromise = Promise.all(promises);
-        console.log(thePromise);
-        return thePromise;
     });
 };
 
@@ -92,8 +93,9 @@ export const evaluateLogFile = (fileContents: Array<InstrumentTrial>) => {
         }
         return acc;
     }, {})
-    
+
     console.log(output);
+    return output;
 }; 
 
 const evaluateThermometer = (trial: InstrumentTrial) => {

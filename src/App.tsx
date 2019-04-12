@@ -5,7 +5,7 @@ import './assets/css/App.css';
 function App() {
   const [sensorResults, setSensorResults] = useState();
   useEffect(() => {
-    getSensorResults().then((data: ISensorResult) => setSensorResults(data));
+    getTestResults().then((data: ISensorResult) => setSensorResults(data));
   }, [])
 
   return (
@@ -16,9 +16,9 @@ function App() {
   );
 }
 
-async function getSensorResults(){
+async function getTestResults(){
   try {
-    const response = await fetch('http://localhost:3001/getSensorResults');
+    const response = await fetch('http://localhost:3001/getTestResults');
     const data = await response.json();
     return data;
   } catch(e){
