@@ -1,28 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { ISensorResult } from './types';
 import './assets/css/App.css';
 
 function App() {
-  const [sensorResults, setSensorResults] = useState();
+  let [testResults, setTestResults] = useState();
+  
+  async function getTestResults(){
+    try {
+      const response = await fetch('http://localhost:3001/getTestResults');
+      const data = await response.json();
+      setTestResults(data)
+    } catch(e){
+      console.log(e);
+    }
+  }
+
   useEffect(() => {
-    getTestResults().then((data: ISensorResult) => setSensorResults(data));
+    getTestResults();
   }, [])
 
   return (
     <div className='App'>
-      Hello there...
-      {sensorResults ? JSON.stringify(sensorResults): null}
+      <h2>Instrument Results Dashboard</h2>
+      {testResults ? 
+        <table>
+          <tbody>
+            {Object.keys(testResults).map(key =>  
+              <tr key={'header' + key}><th>{key}</th><td>{testResults[key]}</td></tr>
+            )}
+          </tbody>
+        </table>
+      : null} 
     </div>
   );
 }
 
-async function getTestResults(){
-  try {
-    const response = await fetch('http://localhost:3001/getTestResults');
-    const data = await response.json();
-    return data;
-  } catch(e){
-    console.log(e);
-  }
-}
 export default App;

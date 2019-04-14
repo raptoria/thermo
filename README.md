@@ -1,8 +1,11 @@
-## to run the script
-npx ts-node server/parseLog.ts
+## install dependencies
+npm install
 
-## to run client
+## run the server
+npm run server
+
+## run the client
 npm run start
 
-## to run server
-npm run server
+## run tests
+npm run test

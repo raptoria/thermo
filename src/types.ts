@@ -1,4 +1,4 @@
-export interface ISensorResult {
+export interface ITestResults {
     [key:string]: IResult;
 }
 

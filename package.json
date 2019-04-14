@@ -5,8 +5,8 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.16.4",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6"
+    "react": "^16.9.0-alpha.0",
+    "react-dom": "^16.9.0-alpha.0"
   },
   "scripts": {
     "start": "webpack-dev-server --open",
@@ -69,7 +69,7 @@
     "enzyme-adapter-react-16": "^1.12.1",
     "html-webpack-plugin": "^3.2.0",
     "jest": "^24.7.1",
-    "jest-fetch-mock": "^2.1.2",
+    "jest-enzyme": "^7.0.2",
     "jest-transform-stub": "^2.0.0",
     "mini-css-extract-plugin": "^0.6.0",
     "nodemon": "^1.18.11",
