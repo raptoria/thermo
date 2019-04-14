@@ -18,9 +18,10 @@ it("should display fetched data correctly", async () => {
   act(() => {
     ReactDOM.render(<App />, el);
   });
+  
   expect(el.innerHTML).toBe('<div class=\"App\"><h2>Instrument Results Dashboard</h2></div>');
 
-  //@ts-ignore  
+  //@ts-ignore //types don't exist yet for react/react-dom 16.9.0-alpha.0
   await act(async () => {
     resolve({
       ok: true,
@@ -28,6 +29,7 @@ it("should display fetched data correctly", async () => {
       json: () => mockResults
     });
   });
+
   const headers = el.querySelectorAll('th');
   expect(headers.length).toBe(Object.keys(mockResults).length);
 
