@@ -1,6 +1,6 @@
 import express from 'express';
 import cors = require('cors');
-import { parseLogFile, evaluateLogFile, InstrumentTrial } from './parseLog';
+import { parseLogFiles, evaluateLogFile, InstrumentTrial } from './parseLog';
 
 const app = express();
 
@@ -8,7 +8,7 @@ app.use(cors());
 
 app.get('/getTestResults', async (req: any, res: any) => {
   try {
-    const fileContents: Array<InstrumentTrial> = await parseLogFile();
+    const fileContents: Array<InstrumentTrial> = await parseLogFiles();
     const output = evaluateLogFile(fileContents);
     res.send(output);
   } catch (err){

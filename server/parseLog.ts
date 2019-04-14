@@ -1,9 +1,12 @@
 import fs from 'fs';
 import readline from 'readline';
 import { config } from './config';
+
+
+export const emptyDirError = 'log directory is empty';
 const currentDir = './server/logs';
 
-enum Instrument {
+export enum Instrument {
     thermometer = 'thermometer',
     humidity = 'humidity'
 }
@@ -20,57 +23,59 @@ interface LogOutput {
     [name:string]: string;
 }
 
-export const parseLogFile = () => {
+export const parseLogFiles = () => {
     const promises: Array<Promise<InstrumentTrial>> = [];
     return new Promise<Array<InstrumentTrial>>((resolve, reject) => {
-
         fs.readdir(currentDir, (err, files) => {
             if (err){
-                throw Error('could not read dir');
+                reject(emptyDirError);
+                return;
             }
 
-            files.forEach(file => {
-            
-                let instrumentTrial: Partial<InstrumentTrial> = {};
-                instrumentTrial.measurements = [];
-
-                const rd = readline.createInterface({
-                    input: fs.createReadStream(currentDir + '/'+ file),
-                });
-
-                rd.on('line', function(line:string) {
-                    if (line.indexOf('reference') > -1){
-                        const referenceLine = line.split(' ');
-                        instrumentTrial.tempRef = Number(referenceLine[1]);
-                        instrumentTrial.humidityRef = Number(referenceLine[2]);
-                    }
-                    else if (line.startsWith(Instrument.thermometer) || line.startsWith(Instrument.humidity)){
-                        const instrumentArr: Array<string> = line.split(' ');
-                        const type = instrumentArr[0] as keyof typeof Instrument;
-                        instrumentTrial.type = Instrument[type];
-                        instrumentTrial.name = instrumentArr[1];
-                        //console.log(instrumentTrial);
-                    }
-                    else {
-                        const measurementLine: Array<string> = line.split(' ');
-                        const value = Number(measurementLine[1]);
-                        if (!isNaN(value)){
-                            instrumentTrial.measurements!.push(value);
-                        }
-                    }
-                });
-
-                const promise = new Promise<InstrumentTrial>((resolve) => {
-                    rd.on('close', () => {
-                        resolve(instrumentTrial as InstrumentTrial);
-                    });
-                });
-                promises.push(promise);
+            files.forEach((fileName: string) => {
+                promises.push(parseFile(fileName));
             });
 
             Promise.all(promises)
             .then(values => resolve(values))
             .catch(error => reject(error));
+        });
+    });
+};
+
+export const parseFile = (fileName: string): Promise<InstrumentTrial> => {
+    let instrumentTrial: Partial<InstrumentTrial> = {};
+    instrumentTrial.measurements = [];
+
+    const rd = readline.createInterface({
+        input: fs.createReadStream(currentDir + '/'+ fileName),
+    });
+
+    rd.on('line', function(line:string) {
+        if (line.indexOf('reference') > -1){
+            const referenceLine = line.split(' ');
+            instrumentTrial.tempRef = Number(referenceLine[1]);
+            instrumentTrial.humidityRef = Number(referenceLine[2]);
+        }
+        else if (line.startsWith(Instrument.thermometer) || line.startsWith(Instrument.humidity)){
+            const instrumentArr: Array<string> = line.split(' ');
+            const type = instrumentArr[0] as keyof typeof Instrument;
+            instrumentTrial.type = Instrument[type];
+            instrumentTrial.name = instrumentArr[1];
+            //console.log(instrumentTrial);
+        }
+        else {
+            const measurementLine: Array<string> = line.split(' ');
+            const value = Number(measurementLine[1]);
+            if (!isNaN(value)){
+                instrumentTrial.measurements!.push(value);
+            }
+        }
+    });
+
+    return new Promise<InstrumentTrial>((resolve) => {
+        rd.on('close', () => {
+            resolve(instrumentTrial as InstrumentTrial);
         });
     });
 };
