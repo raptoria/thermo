@@ -103,7 +103,7 @@ export const evaluateLogFile = (fileContents: Array<InstrumentTrial>) => {
     return output;
 }; 
 
-const evaluateThermometer = (trial: InstrumentTrial) => {
+export const evaluateThermometer = (trial: InstrumentTrial) => {
     const mean = calculateMean(trial.measurements);
     const variance = calculateVariance(trial.measurements, mean);
     const stdev = Math.sqrt(variance);
@@ -125,19 +125,19 @@ const evaluateThermometer = (trial: InstrumentTrial) => {
     return [trial.name, defaultPrecision];
 }
 
-const evaluateHumidity = (trial: InstrumentTrial) => {
+export const evaluateHumidity = (trial: InstrumentTrial) => {
     const percentPrecision = config.humidity['percent precision'];
     const acceptableRange = percentPrecision * trial.humidityRef;
     const keep = trial.measurements.every((value: number) => Math.abs(value - trial.humidityRef) <= acceptableRange);
     return [trial.name, keep ? 'keep' : 'discard'];
 }
 
-const calculateMean = (list: Array<number>) => {
+export const calculateMean = (list: Array<number>) => {
     const sum = list.reduce((acc, currentValue) => acc + currentValue, 0);
     return (sum/list.length);
 }
 
-const calculateVariance = (list: Array<number>, mean: number) => {
+export const calculateVariance = (list: Array<number>, mean: number) => {
     const sum = list.reduce((acc, currentValue) => acc + Math.pow(currentValue - mean, 2), 0);
     return (sum/list.length);
 }
