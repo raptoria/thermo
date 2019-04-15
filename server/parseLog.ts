@@ -99,7 +99,7 @@ export const evaluateLogFile = (fileContents: Array<InstrumentTrial>) => {
         return acc;
     }, {})
 
-    console.log(output);
+    //console.log(output);
     return output;
 }; 
 
@@ -108,8 +108,8 @@ export const evaluateThermometer = (trial: InstrumentTrial) => {
     const variance = calculateVariance(trial.measurements, mean);
     const stdev = Math.sqrt(variance);
     let defaultPrecision = '';
-    console.log('the std is ' + stdev);
-    console.log('the mean is ' + mean);
+    //console.log('the std is ' + stdev);
+    //console.log('the mean is ' + mean);
 
     for (let key in config.thermometer) {
         const meanRange: number = config.thermometer[key][0];
